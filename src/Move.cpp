@@ -1,8 +1,10 @@
 #include "Move.hpp"
 
-Move::Move(int firstDice, int secondDice)
+Move::Move(std::vector<int> dices)
 {
-    diceRole = std::to_string(firstDice) + std::to_string(secondDice);
+    for(int i = 0;i < dices.size();i++){
+        diceRole += std::to_string(dices[i]);
+    }
 }
 
 void Move::AppendMove(std::string from, std::string to)

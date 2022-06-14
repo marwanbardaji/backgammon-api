@@ -49,60 +49,47 @@ std::vector<Move> Game::GetPossibleMoves()
 {
     possiboleMoves.clear();
     bool canOffCheckers = false;
-    int min = 1;
-    int max = 6;
+    std::vector<int> diceRolls;
+    
+    for(int i = 0; i < 2;i++){
+        diceRolls.push_back(rand() % 6 + 1);
+    }
 
-    int firstDice = rand() % (max - min + 1) + min;
-    int secondDice = rand() % (max - min + 1) + min;
-    int thirdDice = 0;
-    int fourthDice = 0;
+    if(diceRolls[0] == diceRolls[1]){
+        for(int i = 0; i < 2;i++){
+            diceRolls.push_back(diceRolls[0]);
+        }
+    }
 
     int arrSize = 24;
 
-    if (firstDice == secondDice)
-    {
-        thirdDice = firstDice;
-        fourthDice = firstDice;
-    }
-
     if (currentPlayer.GetColor() == black)
     {
-        firstDice = -firstDice;
-        secondDice = -secondDice;
+        for(int i = 0; i < diceRolls.size();i++){
+            diceRolls[i] = -diceRolls[i];
+        }
     }
 
     if (currentPlayer.GetCheckersInHomeQuadrant() == 15)
         canOffCheckers = true;
 
-    for (int i = 0; i < arrSize; i++)
-    {
-        if (points[i].GetOccupiedColor() == currentPlayer.GetColor() && i - firstDice >= 0 && points[i - firstDice].CanMoveTo(currentPlayer))
-        {
-            points[i].RemoveCheckerFromPoint();
-            points[i - firstDice].AddCheckerToPoint();
-            for (int j = 0; j < arrSize; j++)
-            {
-                if (points[j].GetOccupiedColor() == currentPlayer.GetColor() && j - secondDice >= 0 && points[j - secondDice].CanMoveTo(currentPlayer))
-                {
-                    Move move(firstDice, secondDice);
-                    move.AppendMove(std::to_string(i + 1), std::to_string(i + 1 - firstDice));
-                    move.AppendMove(std::to_string(j + 1), std::to_string(j + 1 - secondDice));
-                    possiboleMoves.push_back(move);
-                }
-                else if (canOffCheckers && j - secondDice < 0)
-                {
-                    Move move(firstDice, secondDice);
-                    move.AppendMove(std::to_string(i + 1), std::to_string(i + 1 - firstDice));
-                    move.AppendMove(std::to_string(j + 1), "off");
-                    possiboleMoves.push_back(move);
-                }
-            }
-            points[i].AddCheckerToPoint();
-            points[i - firstDice].RemoveCheckerFromPoint();
-        }
+    Move originMove(diceRolls);
+
+    for(int i = 0;i < diceRolls.size();i++){
+        GeneratePossiboleMoves(possiboleMoves,originMove,canOffCheckers,diceRolls.size(),i+1);
     }
 
     return possiboleMoves;
+}
+
+void Game::GeneratePossiboleMoves(std::vector<Move> &possiboleMoves,Move currentMove,bool canOffCheckers,int diceAmount,int diceIndex){
+    for(int i = 0; i < 24;i++){
+        
+    }
+    
+    if(diceIndex == diceAmount){
+        possiboleMoves.push_back(currentMove);
+    }
 }
 
 void Game::MakeMove(int index)

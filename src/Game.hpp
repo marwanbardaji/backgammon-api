@@ -16,6 +16,7 @@ private:
     Point points[24];
     std::vector<Move> possiboleMoves;
     std::vector<Move> history;
+    void GeneratePossiboleMoves(std::vector<Move> &possiboleMoves,Move currentMove,bool canOffCheckers,int diceAmount,int diceIndex);
 
 public:
     Game();

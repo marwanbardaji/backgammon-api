@@ -11,7 +11,7 @@ class Move
     std::vector<std::string> to;
 
 public:
-    Move(int firstDice, int secondDice);
+    Move(std::vector<int> dices);
 
     void AppendMove(std::string from, std::string to);
 
