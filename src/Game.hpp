@@ -6,22 +6,21 @@
 #include "Point.hpp"
 #include "Player.hpp"
 #include "Move.hpp"
+#include "Board.hpp"
 
 class Game
 {
 private:
-    Player *currentPlayer;
-    Player whitePlayer;
-    Player blackPlayer;
-    std::vector<Point> points;
+    Player turn;
+    Board board;
     std::vector<Move> possiboleMoves;
     std::vector<Move> history;
-    void GeneratePossiboleMoves(std::vector<Move> &possiboleMoves, Move move, std::vector<Point> board, bool canOffCheckers, std::vector<int> &diceRolls, int diceIndex);
+    
+    void GeneratePossiboleMoves(std::vector<Move> &possiboleMoves, Move move, Board board, bool canOffCheckers, std::vector<int> &diceRolls, int diceIndex);
     std::vector<int> RollDice();
     void SwapTurn();
 
 public:
-    Game();
 
     bool GameEnded();
 

@@ -1,50 +1,9 @@
 #include "Game.hpp"
 #include <iostream>
 
-Game::Game()
-{
-    for (int i = 0; i < 24; i++)
-    {
-        Point point;
-        points.push_back(point);
-    }
-
-    whitePlayer.SetColor(white);
-    blackPlayer.SetColor(black);
-
-    points[0].SetOccupiedColor(blackPlayer);
-    points[23].SetOccupiedColor(whitePlayer);
-    points[16].SetOccupiedColor(blackPlayer);
-    points[7].SetOccupiedColor(whitePlayer);
-    points[18].SetOccupiedColor(blackPlayer);
-    points[5].SetOccupiedColor(whitePlayer);
-    points[11].SetOccupiedColor(blackPlayer);
-    points[12].SetOccupiedColor(whitePlayer);
-
-    for (int i = 0; i < 2; i++)
-    {
-        points[0].AddCheckerToPoint();
-        points[23].AddCheckerToPoint();
-    }
-
-    for (int i = 0; i < 3; i++)
-    {
-        points[17].AddCheckerToPoint();
-        points[8].AddCheckerToPoint();
-    }
-
-    for (int i = 0; i < 5; i++)
-    {
-        points[19].AddCheckerToPoint();
-        points[6].AddCheckerToPoint();
-        points[12].AddCheckerToPoint();
-        points[13].AddCheckerToPoint();
-    }
-}
-
 bool Game::GameEnded()
 {
-    return (whitePlayer.GetHomeCheckers() == 15 || blackPlayer.GetHomeCheckers() == 15) ? true : false;
+    return (board.GetHomeCheckers(white) == 15 || board.GetHomeCheckers(black) == 15) ? true : false;
 }
 
 std::vector<Move> Game::GetPossibleMoves(bool firstMove)
@@ -57,12 +16,12 @@ std::vector<Move> Game::GetPossibleMoves(bool firstMove)
     {
         if (diceRolls[0] > diceRolls[1])
         {
-            currentPlayer = &whitePlayer;
+            turn = white;
             break;
         }
         else if (diceRolls[1] > diceRolls[0])
         {
-            currentPlayer = &blackPlayer;
+            turn = black;
             break;
         }
         else
@@ -71,7 +30,7 @@ std::vector<Move> Game::GetPossibleMoves(bool firstMove)
         }
     }
 
-    if (currentPlayer->GetColor() == black)
+    if (turn == black)
     {
         for (size_t i = 0; i < diceRolls.size(); i++)
         {
@@ -79,18 +38,16 @@ std::vector<Move> Game::GetPossibleMoves(bool firstMove)
         }
     }
 
-    if (currentPlayer->GetCheckersInHomeQuadrant() == 15)
+    if (board.GetCheckersInHomeQuadrant(turn) == 15)
         canOffCheckers = true;
 
     Move originMove(diceRolls);
 
-    std::cout << "STARTING PLAYER IS " << currentPlayer->GetColor() << std::endl;
-
-    GeneratePossiboleMoves(possiboleMoves, originMove, points, canOffCheckers, diceRolls, 0);
+    GeneratePossiboleMoves(possiboleMoves, originMove, board, canOffCheckers, diceRolls, 0);
 
     for (int i = 0; i < 24; i++)
     {
-        std::cout << std::to_string(i + 1) << " : " << points[i].GetCheckerAmount() << std::endl;
+        std::cout << std::to_string(i + 1) << " : " << board.GetPoints()[i].GetCheckerAmount() << std::endl;
     }
 
     return possiboleMoves;
@@ -98,13 +55,13 @@ std::vector<Move> Game::GetPossibleMoves(bool firstMove)
 
 void Game::SwapTurn()
 {
-    if (currentPlayer->GetColor() == white)
+    if (turn == white)
     {
-        currentPlayer = &blackPlayer;
+        turn = black;
     }
     else
     {
-        currentPlayer = &whitePlayer;
+        turn = white;
     }
 }
 
@@ -128,7 +85,7 @@ std::vector<int> Game::RollDice()
     return diceRolls;
 }
 
-void Game::GeneratePossiboleMoves(std::vector<Move> &possiboleMoves, Move move, std::vector<Point> board, bool canOffCheckers, std::vector<int> &diceRolls, int diceIndex)
+void Game::GeneratePossiboleMoves(std::vector<Move> &possiboleMoves, Move move,Board tempBoard, bool canOffCheckers, std::vector<int> &diceRolls, int diceIndex)
 {
     if (diceIndex == static_cast<int>(diceRolls.size()))
     {
@@ -138,23 +95,36 @@ void Game::GeneratePossiboleMoves(std::vector<Move> &possiboleMoves, Move move, 
 
     for (int i = 0; i < 24; i++)
     {
-        if (board[i].GetOccupiedColor() == currentPlayer->GetColor())
+        if (tempBoard.GetPoints()[i].GetOccupiedColor() == turn)
         {
-            if (i - diceRolls[diceIndex] >= 0 && board[i - diceRolls[diceIndex]].CanMoveTo(*currentPlayer) == 0)
+            if (i - diceRolls[diceIndex] >= 0 && tempBoard.GetPoints()[i - diceRolls[diceIndex]].CanMoveTo(turn) == 0)
             {
-                move.AppendMove(std::to_string(i + 1), std::to_string(i - diceRolls[diceIndex] + 1));
-                // std::cout << "Current move " << move.GetMove() << " Current index " << diceIndex << std::endl;
-                board[i].RemoveCheckerFromPoint();
-                board[i - diceRolls[diceIndex]].RemoveCheckerFromPoint();
-                GeneratePossiboleMoves(possiboleMoves, move, board, canOffCheckers, diceRolls, diceIndex + 1);
+                Move copyMove = move;
+                copyMove.AppendMove(std::to_string(i + 1), std::to_string(i - diceRolls[diceIndex] + 1));
+                Board copyBoard = board;
+                copyBoard.GetPoints()[i].RemoveCheckerFromPoint();
+                copyBoard.GetPoints()[i-diceRolls[diceIndex]].AddCheckerToPoint();
+                GeneratePossiboleMoves(possiboleMoves, copyMove, copyBoard, canOffCheckers, diceRolls, diceIndex + 1);
             }
-            else if (i - diceRolls[diceIndex] >= 0 && board[i - diceRolls[diceIndex]].CanMoveTo(*currentPlayer) == 1)
+            else if (i - diceRolls[diceIndex] >= 0 && tempBoard.GetPoints()[i - diceRolls[diceIndex]].CanMoveTo(turn) == 1)
             {
-                move.AppendMove(std::to_string(i + 1), std::to_string(i - diceRolls[diceIndex] + 1) + "*");
-                // std::cout << "Current move " << move.GetMove() << " Current index " << diceIndex << std::endl;
-                board[i].RemoveCheckerFromPoint();
-                board[i - diceRolls[diceIndex]].RemoveCheckerFromPoint();
-                GeneratePossiboleMoves(possiboleMoves, move, board, canOffCheckers, diceRolls, diceIndex + 1);
+                Move copyMove = move;
+                copyMove.AppendMove(std::to_string(i + 1), std::to_string(i - diceRolls[diceIndex] + 1) + "*");
+                Board copyBoard;
+                copyBoard.GetPoints()[i].RemoveCheckerFromPoint();
+                copyBoard.GetPoints()[i-diceRolls[diceIndex]].KnockOutPiece(turn);
+                if(turn == white){
+                    copyBoard.IncreaseBarCheckers(black);
+                }
+                else{
+                    copyBoard.IncreaseBarCheckers(white);
+                }
+                GeneratePossiboleMoves(possiboleMoves, copyMove, copyBoard, canOffCheckers, diceRolls, diceIndex + 1);
+            }
+            else if(canOffCheckers && i - diceRolls[diceIndex] < 0){
+                Move copyMove = move;
+                copyMove.AppendMove(std::to_string(i + 1), "off");
+                GeneratePossiboleMoves(possiboleMoves, copyMove, board, canOffCheckers, diceRolls, diceIndex + 1);
             }
         }
     }
@@ -169,32 +139,32 @@ void Game::MakeMove(int index)
     {
         if (from[i] == "bar")
         {
-            currentPlayer->DecreaseBarCheckers();
+            board.DecreaseBarCheckers(turn);
         }
         else
         {
-            points[std::stoi(from[i])].RemoveCheckerFromPoint();
+            board.GetPoints()[std::stoi(from[i])].RemoveCheckerFromPoint();
         }
 
         if (to[i] == "off")
         {
-            currentPlayer->IncreaseHomeCheckers();
+            board.IncreaseHomeCheckers(turn);
         }
         else if (to[i].back() == '*')
         {
-            if (currentPlayer->GetColor() == white)
+            if (turn == white)
             {
-                blackPlayer.IncreaseBarCheckers();
+                board.IncreaseBarCheckers(black);
             }
             else
             {
-                whitePlayer.IncreaseBarCheckers();
+                board.IncreaseBarCheckers(white);
             }
-            points[std::stoi(from[i])].KnockOutPiece(*currentPlayer);
+            board.GetPoints()[std::stoi(from[i])].KnockOutPiece(turn);
         }
         else
         {
-            points[std::stoi(to[i])].AddCheckerToPoint();
+            board.GetPoints()[std::stoi(to[i])].AddCheckerToPoint();
         }
     }
 

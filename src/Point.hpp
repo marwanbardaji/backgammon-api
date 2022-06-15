@@ -5,13 +5,13 @@
 
 class Point
 {
-    PlayerColor occupiedPlayer;
+    Player occupiedPlayer;
     int checkerAmount;
 
 public:
     Point();
 
-    PlayerColor GetOccupiedColor();
+    Player GetOccupiedColor();
 
     void SetOccupiedColor(Player player);
 

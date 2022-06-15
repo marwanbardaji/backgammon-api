@@ -6,14 +6,14 @@ Point::Point()
     checkerAmount = 0;
 }
 
-PlayerColor Point::GetOccupiedColor()
+Player Point::GetOccupiedColor()
 {
     return occupiedPlayer;
 }
 
 void Point::SetOccupiedColor(Player player)
 {
-    occupiedPlayer = player.GetColor();
+    occupiedPlayer = player;
 }
 
 void Point::AddCheckerToPoint()
@@ -35,13 +35,13 @@ void Point::RemoveCheckerFromPoint()
 
 void Point::KnockOutPiece(Player player)
 {
-    occupiedPlayer = player.GetColor();
+    occupiedPlayer = player;
     checkerAmount = 1;
 }
 
 int Point::CanMoveTo(Player player)
 {
-    if (occupiedPlayer == player.GetColor() || occupiedPlayer == none)
+    if (occupiedPlayer == player || occupiedPlayer == none)
         return 0;
 
     if (checkerAmount < 2)

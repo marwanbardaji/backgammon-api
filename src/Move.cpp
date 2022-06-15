@@ -33,10 +33,10 @@ std::vector<std::string> Move::GetTo()
 
 std::string Move::GetMove()
 {
-    std::string move = diceRole;
+    std::string move = diceRole + ": ";
     for (size_t i = 0; i < from.size(); i++)
     {
-        move += ": " + from[i] + "/" + to[i];
+        move += from[i] + "/" + to[i] + " ";
     }
     return move;
 }
