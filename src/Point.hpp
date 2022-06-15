@@ -15,11 +15,13 @@ public:
 
     void SetOccupiedColor(Player player);
 
+    int GetCheckerAmount();
+
     void AddCheckerToPoint();
 
     void RemoveCheckerFromPoint();
 
-    bool CanMoveTo(Player player);
+    int CanMoveTo(Player player);
 
     void KnockOutPiece(Player player);
 };

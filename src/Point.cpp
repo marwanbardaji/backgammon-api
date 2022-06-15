@@ -21,24 +21,31 @@ void Point::AddCheckerToPoint()
     checkerAmount++;
 }
 
+int Point::GetCheckerAmount()
+{
+    return checkerAmount;
+}
+
 void Point::RemoveCheckerFromPoint()
 {
     checkerAmount--;
+    if (checkerAmount == 0)
+        occupiedPlayer = none;
 }
 
 void Point::KnockOutPiece(Player player)
 {
     occupiedPlayer = player.GetColor();
-    checkerAmount++;
+    checkerAmount = 1;
 }
 
-bool Point::CanMoveTo(Player player)
+int Point::CanMoveTo(Player player)
 {
     if (occupiedPlayer == player.GetColor() || occupiedPlayer == none)
-        return true;
+        return 0;
 
     if (checkerAmount < 2)
-        return true;
+        return 1;
 
-    return false;
+    return -1;
 }

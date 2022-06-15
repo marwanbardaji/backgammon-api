@@ -2,9 +2,17 @@
 
 Move::Move(std::vector<int> dices)
 {
-    for(int i = 0;i < dices.size();i++){
+    for (size_t i = 0; i < dices.size(); i++)
+    {
         diceRole += std::to_string(dices[i]);
     }
+}
+
+Move::Move(const Move &move)
+{
+    diceRole = move.diceRole;
+    from = move.from;
+    to = move.to;
 }
 
 void Move::AppendMove(std::string from, std::string to)
@@ -26,7 +34,7 @@ std::vector<std::string> Move::GetTo()
 std::string Move::GetMove()
 {
     std::string move = diceRole;
-    for (int i = 0; i < from.size(); i++)
+    for (size_t i = 0; i < from.size(); i++)
     {
         move += ": " + from[i] + "/" + to[i];
     }

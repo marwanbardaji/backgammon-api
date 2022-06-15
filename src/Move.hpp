@@ -13,6 +13,8 @@ class Move
 public:
     Move(std::vector<int> dices);
 
+    Move(const Move &);
+
     void AppendMove(std::string from, std::string to);
 
     std::vector<std::string> GetFrom();

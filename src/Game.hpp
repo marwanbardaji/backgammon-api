@@ -10,22 +10,22 @@
 class Game
 {
 private:
-    Player currentPlayer;
+    Player *currentPlayer;
     Player whitePlayer;
     Player blackPlayer;
-    Point points[24];
+    std::vector<Point> points;
     std::vector<Move> possiboleMoves;
     std::vector<Move> history;
-    void GeneratePossiboleMoves(std::vector<Move> &possiboleMoves,Move currentMove,bool canOffCheckers,int diceAmount,int diceIndex);
+    void GeneratePossiboleMoves(std::vector<Move> &possiboleMoves, Move move, std::vector<Point> board, bool canOffCheckers, std::vector<int> &diceRolls, int diceIndex);
+    std::vector<int> RollDice();
+    void SwapTurn();
 
 public:
     Game();
 
-    ~Game();
-
     bool GameEnded();
 
-    std::vector<Move> GetPossibleMoves();
+    std::vector<Move> GetPossibleMoves(bool firstMove);
 
     void MakeMove(int index);
 };
