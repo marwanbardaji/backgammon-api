@@ -10,11 +10,11 @@ void GetHistory()
 {
 }
 
-void GetBoard()
+void GetBoard(Game &game)
 {
 }
 
-void ChoosePlayerColor()
+void ChoosePlayerColor(Game &game, Player color)
 {
 }
 
@@ -22,13 +22,7 @@ int main()
 {
     srand(time(0));
     Game game;
-
-    std::vector<Move> moves = game.GetPossibleMoves(true);
-
-    for (size_t i = 0; i < moves.size(); i++)
-    {
-        std::cout << std::to_string(i + 1) << ": " << moves[i].GetMove() << std::endl;
-    }
+    game.NextGameState();
 
     return 0;
 }

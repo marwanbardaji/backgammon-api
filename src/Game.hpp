@@ -15,18 +15,17 @@ private:
     Board board;
     std::vector<Move> possiboleMoves;
     std::vector<Move> history;
-    
-    void GeneratePossiboleMoves(std::vector<Move> &possiboleMoves, Move move, Board board, bool canOffCheckers, std::vector<int> &diceRolls, int diceIndex);
+
     std::vector<int> RollDice();
+    void GetPossibleMoves(bool firstMove, std::vector<int> &diceRolls);
     void SwapTurn();
 
 public:
-
     bool GameEnded();
 
-    std::vector<Move> GetPossibleMoves(bool firstMove);
+    void NextGameState();
 
-    void MakeMove(int index);
+    void MakeMove(Move move);
 };
 
 #endif

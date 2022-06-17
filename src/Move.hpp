@@ -6,16 +6,20 @@
 
 class Move
 {
+    bool noMove;
+    int diceIndexOfMove;
     std::string diceRole;
     std::vector<std::string> from;
     std::vector<std::string> to;
 
 public:
-    Move(std::vector<int> dices);
-
-    Move(const Move &);
+    Move(std::vector<int> dices, int diceIndexOfMove);
 
     void AppendMove(std::string from, std::string to);
+
+    void SetNoMove();
+
+    int GetDiceIndexOfMove();
 
     std::vector<std::string> GetFrom();
 
