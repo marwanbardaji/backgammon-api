@@ -1,28 +1,20 @@
 #include <iostream>
 #include <ctime>
-#include "Game.hpp"
-
-void MakeMove(int index)
-{
-}
-
-void GetHistory()
-{
-}
-
-void GetBoard(Game &game)
-{
-}
-
-void ChoosePlayerColor(Game &game, Player color)
-{
-}
+#include "../headers/Point.hpp"
+#include <string>
 
 int main()
 {
     srand(time(0));
-    Game game;
-    game.NextGameState();
+    Checker a(black);
+
+    Point p(black, 4);
+
+    Checker *oldReference = p.getCheckers().front();
+    std::cout << p.getCheckers().front()->getId() << std::endl;
+    std::cout << oldReference->getId() << std::endl;
+    p.~Point();
+    std::cout << oldReference->getId() << std::endl;
 
     return 0;
 }

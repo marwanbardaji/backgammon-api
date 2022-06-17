@@ -1,51 +1,66 @@
-#include "Point.hpp"
+#include "../headers/Point.hpp"
+#include <iostream>
 
 Point::Point()
 {
-    occupiedPlayer = none;
-    checkerAmount = 0;
+    this->occupiedColor = notOccupied;
 }
 
-Player Point::GetOccupiedColor()
+Point::Point(CheckerColor color, int numberOfCheckers)
 {
-    return occupiedPlayer;
+    this->occupiedColor = color == black ? blackOccupied : whiteOccupied;
+    for (int i = 0; i < numberOfCheckers; i++)
+    {
+        //! MAYBE DANGEROUS
+        this->addChecker(new Checker(color));
+    }
 }
 
-void Point::SetOccupiedColor(Player player)
+Point::~Point()
 {
-    occupiedPlayer = player;
+    std::list<Checker *>::iterator it;
+    for (it = this->checkers.begin(); it != this->checkers.end(); ++it)
+    {
+        delete (*it);
+    }
+}
+PointColor Point::getOccupiedColor()
+{
+    return this->occupiedColor;
 }
 
-void Point::AddCheckerToPoint()
+int Point::getCheckerAmount()
 {
-    checkerAmount++;
+    return this->checkers.size();
 }
 
-int Point::GetCheckerAmount()
+//! Remove this method later
+std::list<Checker *> Point::getCheckers()
 {
-    return checkerAmount;
+    return this->checkers;
+}
+bool Point::possibleToAdd(Checker *newChecker)
+{
+    if ((this->occupiedColor == notOccupied) || (this->occupiedColor == blackOccupied && newChecker->getColor() == black) || (this->occupiedColor == whiteOccupied && newChecker->getColor() == white))
+    {
+        return true;
+    }
+    else
+    {
+        throw "NotPossibleToAdd";
+    }
 }
 
-void Point::RemoveCheckerFromPoint()
+// TODO: Exception if possible to add
+void Point::addChecker(Checker *newChecker)
 {
-    checkerAmount--;
-    if (checkerAmount == 0)
-        occupiedPlayer = none;
-}
-
-void Point::KnockOutPiece(Player player)
-{
-    occupiedPlayer = player;
-    checkerAmount = 1;
-}
-
-int Point::CanMoveTo(Player player)
-{
-    if (occupiedPlayer == player || occupiedPlayer == none)
-        return 0;
-
-    if (checkerAmount < 2)
-        return 1;
-
-    return -1;
+    try
+    {
+        this->possibleToAdd(newChecker);
+        this->checkers.push_back(newChecker);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+    }
 }
