@@ -1,16 +1,15 @@
-#include "Move.hpp"
+#include "../headers/Move.hpp"
 
-Move::Move(std::vector<int> dices, int diceIndexOfMove)
+Move::Move(std::vector<int> dices)
 {
-    this->diceIndexOfMove = diceIndexOfMove;
-    noMove = false;
+    this->noMove = false;
     for (size_t i = 0; i < dices.size(); i++)
     {
-        diceRole += std::to_string(dices[i]);
+        this->diceRole += std::to_string(dices[i]);
     }
 }
 
-void Move::AppendMove(std::string from, std::string to)
+void Move::AppendMove(int from, int to)
 {
     this->from.push_back(from);
     this->to.push_back(to);
@@ -18,22 +17,17 @@ void Move::AppendMove(std::string from, std::string to)
 
 void Move::SetNoMove()
 {
-    noMove = true;
+    this->noMove = true;
 }
 
-int Move::GetDiceIndexOfMove()
+std::vector<int> Move::GetFrom()
 {
-    return this->diceIndexOfMove;
+    return this->from;
 }
 
-std::vector<std::string> Move::GetFrom()
+std::vector<int> Move::GetTo()
 {
-    return from;
-}
-
-std::vector<std::string> Move::GetTo()
-{
-    return to;
+    return this->to;
 }
 
 std::string Move::GetMove()
@@ -43,7 +37,27 @@ std::string Move::GetMove()
     std::string move = diceRole + ": ";
     for (size_t i = 0; i < from.size(); i++)
     {
-        move += from[i] + "/" + to[i] + " ";
+        if (from[i] == Bar)
+        {
+            move += "Bar";
+        }
+        else
+        {
+            move += std::to_string(from[i]);
+        }
+        move += "/";
+        if (to[i] == Off)
+        {
+            move += "Off";
+        }
+        else if (to[i] == Hit)
+        {
+            move += std::to_string(to[i]) + "*";
+        }
+        else
+        {
+            move += std::to_string(to[i]);
+        }
     }
     return move;
 }

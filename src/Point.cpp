@@ -1,51 +1,89 @@
-#include "Point.hpp"
+#include "../headers/Point.hpp"
+#include <iostream>
 
 Point::Point()
 {
-    occupiedPlayer = none;
-    checkerAmount = 0;
+    this->occupiedColor = notOccupied;
 }
 
-Player Point::GetOccupiedColor()
+Point::Point(CheckerColor color, int numberOfCheckers)
 {
-    return occupiedPlayer;
+    this->occupiedColor = notOccupied;
+    this->addNewCheckersToEmptyPoint(color, numberOfCheckers);
 }
 
-void Point::SetOccupiedColor(Player player)
+Point::~Point()
 {
-    occupiedPlayer = player;
+    std::list<Checker *>::iterator it;
+    for (it = this->checkers.begin(); it != this->checkers.end(); ++it)
+    {
+        delete (*it);
+    }
 }
-
-void Point::AddCheckerToPoint()
+PointColor Point::getOccupiedColor()
 {
-    checkerAmount++;
+    return this->occupiedColor;
 }
 
-int Point::GetCheckerAmount()
+int Point::getCheckerAmount()
 {
-    return checkerAmount;
+    return this->checkers.size();
 }
 
-void Point::RemoveCheckerFromPoint()
+int Point::getCheckerAmount(CheckerColor color)
 {
-    checkerAmount--;
-    if (checkerAmount == 0)
-        occupiedPlayer = none;
+    return (color == black && this->occupiedColor == blackOccupied) || (color == white && this->occupiedColor == whiteOccupied) ? this->getCheckerAmount() : 0;
 }
 
-void Point::KnockOutPiece(Player player)
+//! Remove this method later
+std::list<Checker *> Point::getCheckers()
 {
-    occupiedPlayer = player;
-    checkerAmount = 1;
+    return this->checkers;
 }
 
-int Point::CanMoveTo(Player player)
+Checker *Point::popChecker()
 {
-    if (occupiedPlayer == player || occupiedPlayer == none)
-        return 0;
-
-    if (checkerAmount < 2)
-        return 1;
-
-    return -1;
+    Checker *topChecker = this->checkers.front();
+    checkers.pop_front();
+    return topChecker;
 }
+
+bool Point::possibleToAdd(Checker *newChecker)
+{
+    if ((this->occupiedColor == notOccupied) || (this->occupiedColor == blackOccupied && newChecker->getColor() == black) || (this->occupiedColor == whiteOccupied && newChecker->getColor() == white))
+    {
+        return true;
+    }
+    else
+    {
+        throw "NotPossibleToAdd";
+    }
+}
+
+// TODO: Exception if possible to add
+void Point::addChecker(Checker *newChecker)
+{
+    try
+    {
+        this->possibleToAdd(newChecker);
+        this->occupiedColor = newChecker->getColor() == black ? blackOccupied : whiteOccupied;
+        this->checkers.push_back(newChecker);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+}
+
+void Point::addNewCheckersToEmptyPoint(CheckerColor color, int numberOfCheckers)
+{
+    if (this->occupiedColor == notOccupied)
+    {
+        this->occupiedColor = color == black ? blackOccupied : whiteOccupied; // TODO Conversion between enums in private method
+        for (int i = 0; i < numberOfCheckers; i++)
+        {
+            //! MAYBE DANGEROUS
+            this->addChecker(new Checker(color));
+        }
+    } // TODO Exception
+};

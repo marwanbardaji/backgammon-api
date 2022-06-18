@@ -1,142 +1,75 @@
-#include "Board.hpp"
-
+#include "../headers/Board.hpp"
+#include <string> //TODO Ta bot när printBoard tas bort
 Board::Board()
 {
-    for (int i = 0; i < 24; i++)
+    this->points[0].addNewCheckersToEmptyPoint(white, 2);
+    this->points[23].addNewCheckersToEmptyPoint(black, 2);
+    this->points[16].addNewCheckersToEmptyPoint(white, 3);
+    this->points[7].addNewCheckersToEmptyPoint(black, 3);
+    this->points[18].addNewCheckersToEmptyPoint(white, 5);
+    this->points[5].addNewCheckersToEmptyPoint(black, 5);
+    this->points[11].addNewCheckersToEmptyPoint(white, 5);
+    this->points[12].addNewCheckersToEmptyPoint(black, 5);
+    this->homeBlack = 0;
+    this->homeWhite = 0;
+    this->blackBar = Point(black, 0);
+    this->whiteBar = Point(white, 0);
+}
+int Board::getNumberOfCheckersInHomeQuadrant(CheckerColor color)
+{
+    int numberOfCheckers = 0;
+    int startPoint = color == black ? 18 : 0;
+    for (int i = startPoint; i < startPoint + 6; i++)
     {
-        Point point;
-        points.push_back(point);
+        numberOfCheckers += this->points[i].getCheckerAmount(color);
     }
+    return numberOfCheckers;
+} // TODO Kanske spara int
 
-    points[0].SetOccupiedColor(black);
-    points[23].SetOccupiedColor(white);
-    points[16].SetOccupiedColor(black);
-    points[7].SetOccupiedColor(white);
-    points[18].SetOccupiedColor(black);
-    points[5].SetOccupiedColor(white);
-    points[11].SetOccupiedColor(black);
-    points[12].SetOccupiedColor(white);
+int Board::getHome(CheckerColor color)
+{
+    return color == black ? this->homeBlack : this->homeWhite;
+}
 
-    for (int i = 0; i < 2; i++)
+Point Board::getPoint(int index)
+{
+    return this->points[index];
+}
+
+std::string Board::printBoard()
+{
+    std::string returnString = "";
+    for (int i = 12; i < 24; i++)
     {
-        points[0].AddCheckerToPoint();
-        points[23].AddCheckerToPoint();
+        PointColor occupiedColor = points[i].getOccupiedColor();
+        returnString += occupiedColor == notOccupied ? " " : (occupiedColor == blackOccupied ? "B" : "W");
+        returnString += i == 17 ? " | " : " ";
     }
-
-    for (int i = 0; i < 3; i++)
+    returnString += "\n";
+    for (int i = 12; i < 24; i++)
     {
-        points[17].AddCheckerToPoint();
-        points[8].AddCheckerToPoint();
+        returnString += std::to_string(points[i].getCheckerAmount());
+        returnString += i == 17 ? " | " : " ";
+        // TODO HEXA DECIMAL För värden större än 9
     }
-
-    for (int i = 0; i < 5; i++)
+    returnString += "\n";
+    returnString += "\n";
+    for (int i = 11; i >= 0; i--)
     {
-        points[19].AddCheckerToPoint();
-        points[6].AddCheckerToPoint();
-        points[12].AddCheckerToPoint();
-        points[13].AddCheckerToPoint();
+        returnString += std::to_string(points[i].getCheckerAmount());
+        returnString += i == 6 ? " | " : " ";
+        // TODO HEXA DECIMAL För värden större än 9
     }
-
-    whiteBarCheckers = 0;
-    blackBarCheckers = 0;
-    whiteHomeCheckers = 0;
-    blackHomeCheckers = 0;
-    whiteCheckersInHomeQuadrant = 2;
-    blackCheckersInHomeQuadrant = 2;
-}
-
-Board::Board(const Board &board)
-{
-    blackHomeCheckers = board.blackHomeCheckers;
-    whiteHomeCheckers = board.whiteHomeCheckers;
-    blackBarCheckers = board.blackBarCheckers;
-    whiteBarCheckers = board.whiteBarCheckers;
-    blackCheckersInHomeQuadrant = board.blackCheckersInHomeQuadrant;
-    whiteCheckersInHomeQuadrant = board.whiteCheckersInHomeQuadrant;
-
-    points = board.points;
-}
-
-void Board::IncreaseHomeCheckers(Player color)
-{
-    if(color == white){
-        whiteHomeCheckers++;
+    returnString += "\n";
+    for (int i = 11; i >= 0; i--)
+    {
+        PointColor occupiedColor = points[i].getOccupiedColor();
+        returnString += occupiedColor == notOccupied ? " " : (occupiedColor == blackOccupied ? "B" : "W");
+        returnString += i == 6 ? " | " : " ";
     }
-    else{
-        blackHomeCheckers++;
-    }
-}
-
-void Board::IncreaseBarCheckers(Player color)
-{
-    if(color == white){
-        whiteBarCheckers++;
-    }
-    else{
-        blackBarCheckers++;
-    }
-}
-
-void Board::IncreaseCheckersInHomeQuadrant(Player color)
-{
-    if(color == white){
-        whiteCheckersInHomeQuadrant++;
-    }
-    else{
-        blackCheckersInHomeQuadrant++;
-    }
-}
-
-void Board::DecreaseBarCheckers(Player color)
-{
-    if(color == white){
-        whiteHomeCheckers--;
-    }
-    else{
-        blackHomeCheckers--;
-    }
-}
-
-void Board::DecreaseCheckersInHomeQuadrant(Player color)
-{
-    if(color == white){
-        whiteCheckersInHomeQuadrant--;
-    }
-    else{
-        blackCheckersInHomeQuadrant--;
-    }
-}
-
-int Board::GetHomeCheckers(Player color)
-{
-    if(color == white){
-        return whiteHomeCheckers;
-    }
-    else{
-        return blackHomeCheckers;
-    }
-}
-
-int Board::GetBarCheckers(Player color)
-{
-    if(color == white){
-        return whiteBarCheckers;;
-    }
-    else{
-        return blackBarCheckers;
-    }
-}
-
-int Board::GetCheckersInHomeQuadrant(Player color)
-{
-    if(color == white){
-        return whiteCheckersInHomeQuadrant;
-    }
-    else{
-        return blackCheckersInHomeQuadrant;
-    }
-}
-
-std::vector<Point> Board::GetPoints(){
-    return points;
+    returnString += "\n";
+    returnString += "HW" + std::to_string(this->getHome(white)) + "   " + "HB" + std::to_string(this->getHome(black)) + "   ";
+    returnString += "BW" + std::to_string(this->blackBar.getCheckerAmount()) + "   " + "BB" + std::to_string(this->whiteBar.getCheckerAmount());
+    returnString += "\n";
+    return returnString;
 }

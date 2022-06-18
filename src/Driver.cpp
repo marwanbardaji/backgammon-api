@@ -1,28 +1,12 @@
 #include <iostream>
 #include <ctime>
-#include "Game.hpp"
-
-void MakeMove(int index)
-{
-}
-
-void GetHistory()
-{
-}
-
-void GetBoard(Game &game)
-{
-}
-
-void ChoosePlayerColor(Game &game, Player color)
-{
-}
+#include "../headers/Board.hpp"
+#include <string>
 
 int main()
 {
     srand(time(0));
-    Game game;
-    game.NextGameState();
-
+    Board b;
+    std::cout << b.printBoard() << std::endl;
     return 0;
 }
