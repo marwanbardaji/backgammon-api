@@ -8,12 +8,8 @@ Point::Point()
 
 Point::Point(CheckerColor color, int numberOfCheckers)
 {
-    this->occupiedColor = color == black ? blackOccupied : whiteOccupied;
-    for (int i = 0; i < numberOfCheckers; i++)
-    {
-        //! MAYBE DANGEROUS
-        this->addChecker(new Checker(color));
-    }
+    this->occupiedColor = notOccupied;
+    this->addNewCheckersToEmptyPoint(color, numberOfCheckers);
 }
 
 Point::~Point()
@@ -32,6 +28,11 @@ PointColor Point::getOccupiedColor()
 int Point::getCheckerAmount()
 {
     return this->checkers.size();
+}
+
+int Point::getCheckerAmount(CheckerColor color)
+{
+    return (color == black && this->occupiedColor == blackOccupied) || (color == white && this->occupiedColor == whiteOccupied) ? this->getCheckerAmount() : 0;
 }
 
 //! Remove this method later
@@ -57,6 +58,7 @@ void Point::addChecker(Checker *newChecker)
     try
     {
         this->possibleToAdd(newChecker);
+        this->occupiedColor = newChecker->getColor() == black ? blackOccupied : whiteOccupied;
         this->checkers.push_back(newChecker);
     }
     catch (const std::exception &e)
@@ -64,3 +66,16 @@ void Point::addChecker(Checker *newChecker)
         std::cerr << e.what() << '\n';
     }
 }
+
+void Point::addNewCheckersToEmptyPoint(CheckerColor color, int numberOfCheckers)
+{
+    if (this->occupiedColor == notOccupied)
+    {
+        this->occupiedColor = color == black ? blackOccupied : whiteOccupied; // ToDo Conversion between enums in private method
+        for (int i = 0; i < numberOfCheckers; i++)
+        {
+            //! MAYBE DANGEROUS
+            this->addChecker(new Checker(color));
+        }
+    } // TODO Exception
+};

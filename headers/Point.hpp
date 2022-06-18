@@ -16,7 +16,9 @@ public:
     Point(CheckerColor color, int numberOfCheckers);
     PointColor getOccupiedColor();
     int getCheckerAmount();
+    int getCheckerAmount(CheckerColor color);
     bool possibleToAdd(Checker *newChecker);
     void addChecker(Checker *newChecker);
     std::list<Checker *> getCheckers();
+    void addNewCheckersToEmptyPoint(CheckerColor color, int numberOfCheckers);
 };
