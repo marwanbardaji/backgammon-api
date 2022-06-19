@@ -9,23 +9,25 @@ class Move
 {
     bool noMove;
     std::string diceRole;
+    std::vector<MoveType> fromType;
+    std::vector<MoveType> toType;
     std::vector<int> from;
     std::vector<int> to;
 
 public:
     Move(std::vector<int> dices);
 
-    void AppendMove(int from, int to);
+    void appendMove(int from, int to);
 
-    void SetNoMove();
+    void setNoMove();
 
-    int GetDiceIndexOfMove();
+    int getDiceIndexOfMove();
 
-    std::vector<int> GetFrom();
+    std::vector<int> getFrom();
 
-    std::vector<int> GetTo();
+    std::vector<int> getTo();
 
-    std::string GetMove();
+    std::string getMove();
 };
 
 #endif

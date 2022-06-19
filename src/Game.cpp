@@ -1,35 +1,45 @@
 #include "../headers/Game.hpp"
 
-bool Game::GameEnded()
+bool Game::gameEnded()
 {
-    return board.getHome(white) == 15 || board.getHome(black) == 15 ? true : false;
+    return this->board.getHome(white) == 15 || this->board.getHome(black) == 15 ? true : false;
 }
 
-void Game::NextGameState()
+void Game::nextGameState()
 {
-    std::vector<Move> *possibleMoves = GetPossibleMoves(&RollDice());
-
-    SwapTurn();
+    std::vector<Move> *possibleMoves = getPossibleMoves(rollDice());
 }
 
-std::vector<Move> *Game::GetPossibleMoves(std::vector<int> *diceRoll)
-{
-    for (int i = 0; i < 2; i++)
-    {
-        for (int j = 0; j < 24; i++)
-        {
-            if (board.getPoint(i).getOccupiedColor() == turn)
-            {
-            }
-        }
-    }
-}
-
-void Game::SwapTurn()
+std::vector<Move> *Game::getPossibleMoves(std::vector<int> diceRoll)
 {
 }
 
-std::vector<int> Game::RollDice()
+MoveType Game::canMoveToPoint(Checker *checker, bool canOffCheckers, int pointIndex)
+{
+    if (canOffCheckers && ((pointIndex > 23 && checker->getColor() == white) || (pointIndex < 0 && checker->getColor() == black)))
+        return off;
+
+    if (board.getPoint(pointIndex).getOccupiedColor() == notOccupied || checkerAndPointColorIsSame(checker->getColor(), board.getPoint(pointIndex).getOccupiedColor()))
+        return regular;
+
+    if (board.getPoint(pointIndex).getCheckerAmount() < 2)
+        return hit;
+
+    return illegal;
+}
+
+bool Game::checkerAndPointColorIsSame(CheckerColor color, int pointIndex)
+{
+    return (color == black && board.getPoint(pointIndex).getOccupiedColor() == blackOccupied) ||
+           (color == white && board.getPoint(pointIndex).getOccupiedColor() == whiteOccupied);
+}
+
+void Game::swapTurn()
+{
+    this->turn = turn == black ? white : black;
+}
+
+std::vector<int> Game::rollDice()
 {
     std::vector<int> diceRolls;
 
@@ -49,10 +59,10 @@ std::vector<int> Game::RollDice()
     return diceRolls;
 }
 
-void Game::MakeMove(Move move)
+void Game::makeMove(Move move)
 {
-    std::vector<int> from = move.GetFrom();
-    std::vector<int> to = move.GetTo();
+    std::vector<int> from = move.getFrom();
+    std::vector<int> to = move.getTo();
 
     for (size_t i = 0; i < from.size(); i++)
     {
@@ -61,5 +71,5 @@ void Game::MakeMove(Move move)
     }
 
     history.push_back(move);
-    SwapTurn();
+    swapTurn();
 }

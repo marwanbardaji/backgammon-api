@@ -9,35 +9,35 @@ Move::Move(std::vector<int> dices)
     }
 }
 
-void Move::AppendMove(int from, int to)
+void Move::appendMove(int from, int to)
 {
     this->from.push_back(from);
     this->to.push_back(to);
 }
 
-void Move::SetNoMove()
+void Move::setNoMove()
 {
     this->noMove = true;
 }
 
-std::vector<int> Move::GetFrom()
+std::vector<int> Move::getFrom()
 {
     return this->from;
 }
 
-std::vector<int> Move::GetTo()
+std::vector<int> Move::getTo()
 {
     return this->to;
 }
 
-std::string Move::GetMove()
+std::string Move::getMove()
 {
     if (noMove)
         return "(no-play)";
     std::string move = diceRole + ": ";
     for (size_t i = 0; i < from.size(); i++)
     {
-        if (from[i] == Bar)
+        if (fromType[i] == bar)
         {
             move += "Bar";
         }
@@ -46,11 +46,11 @@ std::string Move::GetMove()
             move += std::to_string(from[i]);
         }
         move += "/";
-        if (to[i] == Off)
+        if (to[i] == off)
         {
             move += "Off";
         }
-        else if (to[i] == Hit)
+        else if (to[i] == hit)
         {
             move += std::to_string(to[i]) + "*";
         }

@@ -20,6 +20,7 @@ Point::~Point()
         delete (*it);
     }
 }
+
 PointColor Point::getOccupiedColor()
 {
     return this->occupiedColor;
@@ -44,11 +45,15 @@ std::list<Checker *> Point::getCheckers()
 Checker *Point::popChecker()
 {
     Checker *topChecker = this->checkers.front();
-    checkers.pop_front();
+
+    //! Kanske raderar topChecker
+    this->checkers.pop_front();
+
     return topChecker;
 }
 
-bool Point::possibleToAdd(Checker *newChecker)
+// ? Låta game klassen sköta regel funktioner
+/*bool Point::possibleToAdd(Checker *newChecker)
 {
     if ((this->occupiedColor == notOccupied) || (this->occupiedColor == blackOccupied && newChecker->getColor() == black) || (this->occupiedColor == whiteOccupied && newChecker->getColor() == white))
     {
@@ -58,11 +63,16 @@ bool Point::possibleToAdd(Checker *newChecker)
     {
         throw "NotPossibleToAdd";
     }
-}
+}*/
 
 // TODO: Exception if possible to add
 void Point::addChecker(Checker *newChecker)
 {
+    this->checkers.push_back(newChecker);
+    this->occupiedColor = newChecker->getColor() == black ? blackOccupied : whiteOccupied;
+
+    // ? Låta game klassen sköta regel funktioner
+    /*
     try
     {
         this->possibleToAdd(newChecker);
@@ -72,7 +82,7 @@ void Point::addChecker(Checker *newChecker)
     catch (const std::exception &e)
     {
         std::cerr << e.what() << '\n';
-    }
+    }*/
 }
 
 void Point::addNewCheckersToEmptyPoint(CheckerColor color, int numberOfCheckers)

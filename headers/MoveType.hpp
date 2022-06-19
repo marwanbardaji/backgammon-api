@@ -2,8 +2,9 @@
 
 enum MoveType
 {
-    Regular = -1,
-    Hit = -2,
-    Bar = -3,
-    Off = -4
+    regular,
+    hit,
+    off,
+    bar,
+    illegal
 };

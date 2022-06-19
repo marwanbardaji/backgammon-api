@@ -15,6 +15,7 @@ Board::Board()
     this->blackBar = Point(black, 0);
     this->whiteBar = Point(white, 0);
 }
+
 int Board::getNumberOfCheckersInHomeQuadrant(CheckerColor color)
 {
     int numberOfCheckers = 0;
@@ -29,6 +30,21 @@ int Board::getNumberOfCheckersInHomeQuadrant(CheckerColor color)
 int Board::getHome(CheckerColor color)
 {
     return color == black ? this->homeBlack : this->homeWhite;
+}
+
+void Board::increaseAddCheckerToHome(CheckerColor color)
+{
+    if (color == white)
+    {
+        this->homeWhite++;
+        return;
+    }
+    this->homeBlack++;
+}
+
+Point Board::getBar(CheckerColor color)
+{
+    return color == black ? this->blackBar : this->whiteBar;
 }
 
 Point Board::getPoint(int index)

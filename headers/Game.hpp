@@ -1,11 +1,10 @@
 #pragma once
 
 #include <vector>
-#include <cstdlib>
 
 #include "Point.hpp"
 #include "CheckerColor.hpp"
-#include "../headers/Move.hpp"
+#include "Move.hpp"
 #include "Board.hpp"
 
 class Game
@@ -15,14 +14,16 @@ private:
     Board board;
     std::vector<Move> history;
 
-    std::vector<int> RollDice();
-    std::vector<Move> *GetPossibleMoves(std::vector<int> *diceRoll);
-    void SwapTurn();
+    std::vector<int> rollDice();
+    std::vector<Move> *getPossibleMoves(std::vector<int> diceRoll);
+    bool checkerAndPointColorIsSame(CheckerColor color, int pointIndex);
+    MoveType canMoveToPoint(Checker *checker, bool canOffCheckers, int pointIndex);
+    void swapTurn();
 
 public:
-    bool GameEnded();
+    bool gameEnded();
 
-    void NextGameState();
+    void nextGameState();
 
-    void MakeMove(Move move);
+    void makeMove(Move move);
 };
