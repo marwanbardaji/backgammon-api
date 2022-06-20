@@ -9,10 +9,12 @@ Move::Move(std::vector<int> dices)
     }
 }
 
-void Move::appendMove(int from, int to)
+void Move::appendMove(int from, int to, MoveType fromType, MoveType toType)
 {
     this->from.push_back(from);
     this->to.push_back(to);
+    this->fromType.push_back(fromType);
+    this->toType.push_back(toType);
 }
 
 void Move::setNoMove()
@@ -28,6 +30,16 @@ std::vector<int> Move::getFrom()
 std::vector<int> Move::getTo()
 {
     return this->to;
+}
+
+std::vector<MoveType> Move::getFromType()
+{
+    return this->fromType;
+}
+
+std::vector<MoveType> Move::getToType()
+{
+    return this->toType;
 }
 
 std::string Move::getMove()
@@ -46,11 +58,11 @@ std::string Move::getMove()
             move += std::to_string(from[i]);
         }
         move += "/";
-        if (to[i] == off)
+        if (toType[i] == off)
         {
             move += "Off";
         }
-        else if (to[i] == hit)
+        else if (toType[i] == hit)
         {
             move += std::to_string(to[i]) + "*";
         }
@@ -58,6 +70,7 @@ std::string Move::getMove()
         {
             move += std::to_string(to[i]);
         }
+        move += " ";
     }
     return move;
 }

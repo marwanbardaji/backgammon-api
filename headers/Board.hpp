@@ -14,10 +14,11 @@ private:
 
 public:
     Board();
+    void popChecker(int index);
     int getNumberOfCheckersInHomeQuadrant(CheckerColor color); // TODO Kanske spara int
     int getHome(CheckerColor color);
-    void increaseAddCheckerToHome(CheckerColor color);
+    void addCheckerToHome(CheckerColor color);
     std::string printBoard(); // TODO Ta bort längre fram
-    Point getPoint(int index);
-    Point getBar(CheckerColor color);
+    Point *getPoint(int index);
+    Point *getBar(CheckerColor color);
 };

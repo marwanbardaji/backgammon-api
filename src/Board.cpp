@@ -32,7 +32,7 @@ int Board::getHome(CheckerColor color)
     return color == black ? this->homeBlack : this->homeWhite;
 }
 
-void Board::increaseAddCheckerToHome(CheckerColor color)
+void Board::addCheckerToHome(CheckerColor color)
 {
     if (color == white)
     {
@@ -42,14 +42,14 @@ void Board::increaseAddCheckerToHome(CheckerColor color)
     this->homeBlack++;
 }
 
-Point Board::getBar(CheckerColor color)
+Point *Board::getBar(CheckerColor color)
 {
-    return color == black ? this->blackBar : this->whiteBar;
+    return color == black ? &this->blackBar : &this->whiteBar;
 }
 
-Point Board::getPoint(int index)
+Point *Board::getPoint(int index)
 {
-    return this->points[index];
+    return &this->points[index];
 }
 
 std::string Board::printBoard()
@@ -57,14 +57,14 @@ std::string Board::printBoard()
     std::string returnString = "";
     for (int i = 12; i < 24; i++)
     {
-        PointColor occupiedColor = points[i].getOccupiedColor();
+        PointColor occupiedColor = this->points[i].getOccupiedColor();
         returnString += occupiedColor == notOccupied ? " " : (occupiedColor == blackOccupied ? "B" : "W");
         returnString += i == 17 ? " | " : " ";
     }
     returnString += "\n";
     for (int i = 12; i < 24; i++)
     {
-        returnString += std::to_string(points[i].getCheckerAmount());
+        returnString += std::to_string(this->points[i].getCheckerAmount());
         returnString += i == 17 ? " | " : " ";
         // TODO HEXA DECIMAL För värden större än 9
     }
@@ -72,14 +72,14 @@ std::string Board::printBoard()
     returnString += "\n";
     for (int i = 11; i >= 0; i--)
     {
-        returnString += std::to_string(points[i].getCheckerAmount());
+        returnString += std::to_string(this->points[i].getCheckerAmount());
         returnString += i == 6 ? " | " : " ";
         // TODO HEXA DECIMAL För värden större än 9
     }
     returnString += "\n";
     for (int i = 11; i >= 0; i--)
     {
-        PointColor occupiedColor = points[i].getOccupiedColor();
+        PointColor occupiedColor = this->points[i].getOccupiedColor();
         returnString += occupiedColor == notOccupied ? " " : (occupiedColor == blackOccupied ? "B" : "W");
         returnString += i == 6 ? " | " : " ";
     }

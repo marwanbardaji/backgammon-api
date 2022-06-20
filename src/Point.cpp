@@ -1,5 +1,4 @@
 #include "../headers/Point.hpp"
-#include <iostream>
 
 Point::Point()
 {
@@ -45,44 +44,18 @@ std::list<Checker *> Point::getCheckers()
 Checker *Point::popChecker()
 {
     Checker *topChecker = this->checkers.front();
-
-    //! Kanske raderar topChecker
     this->checkers.pop_front();
+
+    if (checkers.empty())
+        this->occupiedColor = notOccupied;
 
     return topChecker;
 }
 
-// ? Låta game klassen sköta regel funktioner
-/*bool Point::possibleToAdd(Checker *newChecker)
-{
-    if ((this->occupiedColor == notOccupied) || (this->occupiedColor == blackOccupied && newChecker->getColor() == black) || (this->occupiedColor == whiteOccupied && newChecker->getColor() == white))
-    {
-        return true;
-    }
-    else
-    {
-        throw "NotPossibleToAdd";
-    }
-}*/
-
-// TODO: Exception if possible to add
 void Point::addChecker(Checker *newChecker)
 {
     this->checkers.push_back(newChecker);
     this->occupiedColor = newChecker->getColor() == black ? blackOccupied : whiteOccupied;
-
-    // ? Låta game klassen sköta regel funktioner
-    /*
-    try
-    {
-        this->possibleToAdd(newChecker);
-        this->occupiedColor = newChecker->getColor() == black ? blackOccupied : whiteOccupied;
-        this->checkers.push_back(newChecker);
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << '\n';
-    }*/
 }
 
 void Point::addNewCheckersToEmptyPoint(CheckerColor color, int numberOfCheckers)

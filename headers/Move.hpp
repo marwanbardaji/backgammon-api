@@ -17,7 +17,7 @@ class Move
 public:
     Move(std::vector<int> dices);
 
-    void appendMove(int from, int to);
+    void appendMove(int from, int to, MoveType fromType, MoveType toType);
 
     void setNoMove();
 
@@ -26,6 +26,10 @@ public:
     std::vector<int> getFrom();
 
     std::vector<int> getTo();
+
+    std::vector<MoveType> getFromType();
+
+    std::vector<MoveType> getToType();
 
     std::string getMove();
 };

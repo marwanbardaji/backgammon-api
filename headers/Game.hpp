@@ -15,9 +15,11 @@ private:
     std::vector<Move> history;
 
     std::vector<int> rollDice();
-    std::vector<Move> *getPossibleMoves(std::vector<int> diceRoll);
+    void getPossibleMoves(std::vector<Move> *possibleMoves, std::vector<int> diceRoll);
+    void addTemporaryMove(std::vector<Move> *possibleMoves, Checker *fromChecker, Move *move, MoveType fromType, int nextDice, int from, int to);
+    void generateLastMove(std::vector<Move> *possibleMoves, Move *move, int dice);
     bool checkerAndPointColorIsSame(CheckerColor color, int pointIndex);
-    MoveType canMoveToPoint(Checker *checker, bool canOffCheckers, int pointIndex);
+    MoveType canMoveToPoint(CheckerColor checker, int pointIndex);
     void swapTurn();
 
 public:
