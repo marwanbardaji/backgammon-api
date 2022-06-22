@@ -1,3 +1,6 @@
+### VisualStudioCode ###
+.vscode/
+
 # Prerequisites
 *.d
 
@@ -6,6 +9,7 @@
 *.lo
 *.o
 *.obj
+*.d
 
 # Precompiled Headers
 *.gch
