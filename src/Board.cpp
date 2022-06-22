@@ -1,5 +1,6 @@
 #include "../headers/Board.hpp"
 #include <string> //TODO Ta bot när printBoard tas bort
+#include <iostream>
 Board::Board()
 {
     this->points[0].addNewCheckersToEmptyPoint(white, 2);
@@ -14,6 +15,18 @@ Board::Board()
     this->homeWhite = 0;
     this->blackBar = Point(black, 0);
     this->whiteBar = Point(white, 0);
+}
+
+Board::Board(Board &source)
+{
+    for (int i = 0; i < 24; i++)
+    {
+        this->points[i].initializeCopiedPoint(source.getPoint(i).getOccupiedColor(), source.getPoint(i).getCheckerAmount());
+    }
+    this->homeBlack = source.homeBlack;
+    this->homeWhite = source.homeWhite;
+    this->blackBar = source.blackBar;
+    this->whiteBar = source.whiteBar;
 }
 
 int Board::getNumberOfCheckersInHomeQuadrant(CheckerColor color)
@@ -42,14 +55,14 @@ void Board::addCheckerToHome(CheckerColor color)
     this->homeBlack++;
 }
 
-Point *Board::getBar(CheckerColor color)
+Point &Board::getBar(CheckerColor color)
 {
-    return color == black ? &this->blackBar : &this->whiteBar;
+    return color == black ? this->blackBar : this->whiteBar;
 }
 
-Point *Board::getPoint(int index)
+Point &Board::getPoint(int index)
 {
-    return &this->points[index];
+    return this->points[index];
 }
 
 std::string Board::printBoard()

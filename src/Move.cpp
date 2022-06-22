@@ -1,12 +1,26 @@
 #include "../headers/Move.hpp"
+#include <iostream>
 
-Move::Move(std::vector<int> dices)
+Move::Move(std::vector<int> dices, Board board)
 {
+    this->nextBoard = Board(board);
     this->noMove = false;
+
     for (size_t i = 0; i < dices.size(); i++)
     {
-        this->diceRole += std::to_string(dices[i]);
+        this->diceRole += std::to_string(abs(dices[i]));
     }
+}
+
+Move::Move(Move &source)
+{
+    this->diceRole = source.diceRole;
+    this->noMove = source.noMove;
+    this->nextBoard = Board(source.nextBoard);
+    this->from = source.from;
+    this->to = source.to;
+    this->fromType = source.fromType;
+    this->toType = source.toType;
 }
 
 void Move::appendMove(int from, int to, MoveType fromType, MoveType toType)
@@ -15,6 +29,11 @@ void Move::appendMove(int from, int to, MoveType fromType, MoveType toType)
     this->to.push_back(to);
     this->fromType.push_back(fromType);
     this->toType.push_back(toType);
+}
+
+Board &Move::getNextBoard()
+{
+    return this->nextBoard;
 }
 
 void Move::setNoMove()

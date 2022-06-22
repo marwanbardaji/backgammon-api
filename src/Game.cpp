@@ -6,130 +6,122 @@ bool Game::gameEnded()
     return this->board.getHome(white) == 15 || this->board.getHome(black) == 15 ? true : false;
 }
 
-void Game::nextGameState()
+CheckerColor Game::getStartingTurn()
 {
-    turn = white;
-    std::vector<Move> possibleMoves;
+    return CheckerColor(rand() % 2);
+}
 
-    getPossibleMoves(&possibleMoves, rollDice());
+void Game::nextGameState(bool firstMove)
+{
+    if (firstMove)
+        turn = getStartingTurn();
+
+    std::vector<Move *> possibleMoves;
+
+    std::cout << turn << std::endl;
+
+    getPossibleMoves(possibleMoves, rollDice());
 
     for (size_t i = 0; i < possibleMoves.size(); i++)
     {
-        std::cout << std::to_string(i + 1) << ": " << possibleMoves[i].getMove() << std::endl;
+        std::cout << std::to_string(i + 1) << ": " << possibleMoves[i]->getMove() << std::endl;
+        // std::cout << possibleMoves[i].getNextBoard()->printBoard() << std::endl;
     }
 }
 
-// TODO : Fixa generering för dubblet tärningar
-// TODO : Byt tecken på tärningskast baserat på spelar tur
-// TODO : Kombinera loops
-void Game::getPossibleMoves(std::vector<Move> *possibleMoves, std::vector<int> diceRoll)
+void Game::getPossibleMoves(std::vector<Move *> &possibleMoves, std::vector<int> diceRoll)
 {
-    for (int i = 0; i < 24; i++)
-    {
-        if (board.getBar(turn)->getCheckerAmount() > 0)
-        {
-            Move *move = new Move(diceRoll);
-            addTemporaryMove(possibleMoves, board.getBar(turn)->popChecker(), move, bar, diceRoll[1], i, diceRoll[0] - 1);
-            continue;
-        }
-        if (checkerAndPointColorIsSame(turn, i))
-        {
-            Move *move = new Move(diceRoll);
-            addTemporaryMove(possibleMoves, board.getPoint(i)->popChecker(), move, regular, diceRoll[1], i, i - diceRoll[0]);
-        }
-    }
+    Move *move = new Move(diceRoll, this->board);
 
+    if (turn == black)
+    {
+        for (int i = 0; i < 2; i++)
+            diceRoll[i] = -diceRoll[i];
+    }
+    if (diceRoll[0] == diceRoll[1])
+    {
+        TraverseBoard(possibleMoves, diceRoll, move, 0, 4);
+    }
+    else
+    {
+        TraverseBoard(possibleMoves, diceRoll, move, 0, 2);
+        std::vector<int> reversedDice;
+        reversedDice.push_back(diceRoll[1]);
+        reversedDice.push_back(diceRoll[0]);
+        TraverseBoard(possibleMoves, reversedDice, move, 0, 2);
+    }
+    delete move;
+}
+
+void Game::TraverseBoard(std::vector<Move *> &possibleMoves, std::vector<int> diceRoll, Move *move, int currentDepth, int maxDepth)
+{
+    if (currentDepth == maxDepth)
+    {
+        possibleMoves.push_back(move);
+        return;
+    }
     for (int i = 0; i < 24; i++)
     {
-        if (board.getBar(turn)->getCheckerAmount() > 0)
+        if (move->getNextBoard().getBar(turn).getCheckerAmount() > 0)
         {
-            Move *move = new Move(diceRoll);
-            addTemporaryMove(possibleMoves, board.getBar(turn)->popChecker(), move, bar, diceRoll[0], i, diceRoll[1] - 1);
+            Move *newMove = new Move(*move);
+            Checker *topChecker = newMove->getNextBoard().getBar(turn).getFrontChecker();
+            newMove->getNextBoard().getBar(turn).popChecker();
+            int barDice = turn == black ? 24 - diceRoll[currentDepth] : diceRoll[currentDepth] - 1;
+            if (addMoveToBoard(topChecker, newMove, bar, i, barDice))
+            {
+                TraverseBoard(possibleMoves, diceRoll, newMove, currentDepth + 1, maxDepth);
+            }
             continue;
         }
-        if (checkerAndPointColorIsSame(turn, i))
+        if (checkerAndPointColorIsSame(turn, move->getNextBoard(), i))
         {
-            Move *move = new Move(diceRoll);
-            addTemporaryMove(possibleMoves, board.getPoint(i)->popChecker(), move, regular, diceRoll[0], i, i - diceRoll[1]);
+            Move *newMove = new Move(*move);
+            Checker *topChecker = newMove->getNextBoard().getPoint(i).getFrontChecker();
+            newMove->getNextBoard().getPoint(i).popChecker();
+            if (addMoveToBoard(topChecker, newMove, regular, i, i - diceRoll[currentDepth]))
+            {
+                TraverseBoard(possibleMoves, diceRoll, newMove, currentDepth + 1, maxDepth);
+            }
         }
     }
 }
 
-// TODO : Minimera kod, ta bort dubbelkod
-void Game::addTemporaryMove(std::vector<Move> *possibleMoves, Checker *fromChecker, Move *move, MoveType fromType, int nextDice, int from, int to)
+bool Game::addMoveToBoard(Checker *fromChecker, Move *move, MoveType fromType, int from, int to)
 {
-    switch (canMoveToPoint(turn, to))
+    switch (canMoveToPoint(move->getNextBoard(), turn, to))
     {
     case regular:
     {
         move->appendMove(from, to, fromType, regular);
-        board.getPoint(to)->addChecker(fromChecker);
-        generateLastMove(possibleMoves, move, nextDice);
-        break;
+        move->getNextBoard().getPoint(to).addChecker(fromChecker);
+        return true;
     }
     case off:
     {
         move->appendMove(from, to, fromType, off);
-        board.addCheckerToHome(turn);
-        generateLastMove(possibleMoves, move, nextDice);
-        board.getPoint(from)->addChecker(fromChecker);
-        break;
+        delete (fromChecker);
+        move->getNextBoard().addCheckerToHome(turn);
+        return true;
     }
     case hit:
     {
-        Checker *hitChecker = board.getPoint(to)->popChecker();
-        board.getPoint(to)->addChecker(fromChecker);
-        generateLastMove(possibleMoves, move, nextDice);
-        board.getPoint(from)->addChecker(board.getPoint(to)->popChecker());
-        board.getPoint(to)->addChecker(hitChecker);
-        break;
+        Checker *hitChecker = move->getNextBoard().getPoint(to).getFrontChecker();
+        move->getNextBoard().getPoint(to).popChecker();
+        move->getNextBoard().getPoint(to).addChecker(fromChecker);
+        CheckerColor oppositeColor = turn == black ? black : white;
+        move->getNextBoard().getBar(oppositeColor).addChecker(hitChecker);
+        return true;
     }
     default:
-        board.getPoint(from)->addChecker(fromChecker);
-        break;
+        delete move;
+        return false;
     }
 }
 
-// TODO : Minimera kod
-void Game::generateLastMove(std::vector<Move> *possibleMoves, Move *move, int dice)
+MoveType Game::canMoveToPoint(Board &newBoard, CheckerColor checker, int pointIndex)
 {
-    for (int i = 0; i < 24; i++)
-    {
-        if (checkerAndPointColorIsSame(turn, i))
-        {
-            switch (canMoveToPoint(turn, i - dice))
-            {
-            case regular:
-            {
-                Move *newMove = new Move(*move);
-                newMove->appendMove(i, i - dice, regular, regular);
-                possibleMoves->push_back(*newMove);
-                break;
-            }
-            case off:
-            {
-                Move *newMove = new Move(*move);
-                newMove->appendMove(i, i - dice, regular, off);
-                possibleMoves->push_back(*newMove);
-                break;
-            }
-            case hit:
-            {
-                Move *newMove = new Move(*move);
-                newMove->appendMove(i, i - dice, regular, hit);
-                possibleMoves->push_back(*newMove);
-                break;
-            }
-            default:
-                break;
-            }
-        }
-    }
-}
-
-MoveType Game::canMoveToPoint(CheckerColor checker, int pointIndex)
-{
-    bool canOffCheckers = board.getNumberOfCheckersInHomeQuadrant(turn) == 15 ? true : false;
+    bool canOffCheckers = newBoard.getNumberOfCheckersInHomeQuadrant(turn) == 15 ? true : false;
 
     if (!canOffCheckers && (pointIndex > 23 || pointIndex < 0))
         return illegal;
@@ -137,19 +129,19 @@ MoveType Game::canMoveToPoint(CheckerColor checker, int pointIndex)
     if (canOffCheckers && ((pointIndex > 23 && checker == white) || (pointIndex < 0 && checker == black)))
         return off;
 
-    if (board.getPoint(pointIndex)->getOccupiedColor() == notOccupied || checkerAndPointColorIsSame(checker, pointIndex))
+    if (newBoard.getPoint(pointIndex).getOccupiedColor() == notOccupied || checkerAndPointColorIsSame(checker, newBoard, pointIndex))
         return regular;
 
-    if (board.getPoint(pointIndex)->getCheckerAmount() < 2)
+    if (newBoard.getPoint(pointIndex).getCheckerAmount() < 2)
         return hit;
 
     return illegal;
 }
 
-bool Game::checkerAndPointColorIsSame(CheckerColor color, int pointIndex)
+bool Game::checkerAndPointColorIsSame(CheckerColor color, Board &newBoard, int pointIndex)
 {
-    return (color == black && this->board.getPoint(pointIndex)->getOccupiedColor() == blackOccupied) ||
-           (color == white && this->board.getPoint(pointIndex)->getOccupiedColor() == whiteOccupied);
+    return (color == black && newBoard.getPoint(pointIndex).getOccupiedColor() == blackOccupied) ||
+           (color == white && newBoard.getPoint(pointIndex).getOccupiedColor() == whiteOccupied);
 }
 
 void Game::swapTurn()
@@ -162,58 +154,20 @@ std::vector<int> Game::rollDice()
     std::vector<int> diceRolls;
 
     for (int i = 0; i < 2; i++)
-    {
         diceRolls.push_back(rand() % 6 + 1);
-    }
 
     if (diceRolls[0] == diceRolls[1])
     {
         for (int i = 0; i < 2; i++)
-        {
             diceRolls.push_back(diceRolls[0]);
-        }
     }
 
     return diceRolls;
 }
 
-void Game::makeMove(Move move)
+void Game::makeMove(Move *move)
 {
-    std::vector<int> from = move.getFrom();
-    std::vector<int> to = move.getTo();
-    std::vector<MoveType> fromType = move.getFromType();
-    std::vector<MoveType> toType = move.getToType();
-
-    for (size_t i = 0; i < from.size(); i++)
-    {
-        Checker *fromChecker;
-
-        if (fromType[i] == bar)
-        {
-            fromChecker = board.getBar(turn)->popChecker();
-        }
-        else
-        {
-            fromChecker = board.getPoint(from[i])->popChecker();
-        }
-
-        if (toType[i] == off)
-        {
-            board.addCheckerToHome(turn);
-            delete (fromChecker);
-        }
-        else if (toType[i] == hit)
-        {
-            CheckerColor oppositeColor = turn == black ? white : black;
-            board.getBar(oppositeColor)->addChecker(board.getPoint(to[i])->popChecker());
-            board.getPoint(to[i])->addChecker(fromChecker);
-        }
-        else
-        {
-            board.getPoint(to[i])->addChecker(fromChecker);
-        }
-    }
-
+    this->board = move->getNextBoard();
     history.push_back(move);
     swapTurn();
 }

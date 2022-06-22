@@ -6,6 +6,6 @@ int main()
 {
     srand(time(0));
     Game game;
-    game.nextGameState();
+    game.nextGameState(true);
     return 0;
 }

@@ -11,6 +11,15 @@ Point::Point(CheckerColor color, int numberOfCheckers)
     this->addNewCheckersToEmptyPoint(color, numberOfCheckers);
 }
 
+void Point::initializeCopiedPoint(PointColor occupiedColor, int checkerAmount)
+{
+    if (occupiedColor != notOccupied)
+    {
+        CheckerColor checkerColor = this->occupiedColor == blackOccupied ? black : white;
+        addNewCheckersToEmptyPoint(checkerColor, checkerAmount);
+    }
+}
+
 Point::~Point()
 {
     std::list<Checker *>::iterator it;
@@ -41,15 +50,17 @@ std::list<Checker *> Point::getCheckers()
     return this->checkers;
 }
 
-Checker *Point::popChecker()
+Checker *&Point::getFrontChecker()
 {
-    Checker *topChecker = this->checkers.front();
+    return this->checkers.front();
+}
+
+void Point::popChecker()
+{
     this->checkers.pop_front();
 
     if (checkers.empty())
         this->occupiedColor = notOccupied;
-
-    return topChecker;
 }
 
 void Point::addChecker(Checker *newChecker)
@@ -65,8 +76,7 @@ void Point::addNewCheckersToEmptyPoint(CheckerColor color, int numberOfCheckers)
         this->occupiedColor = color == black ? blackOccupied : whiteOccupied; // TODO Conversion between enums in private method
         for (int i = 0; i < numberOfCheckers; i++)
         {
-            //! MAYBE DANGEROUS
             this->addChecker(new Checker(color));
         }
-    } // TODO Exception
+    }
 };

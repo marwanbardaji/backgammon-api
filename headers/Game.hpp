@@ -12,20 +12,21 @@ class Game
 private:
     CheckerColor turn;
     Board board;
-    std::vector<Move> history;
+    std::vector<Move *> history;
 
     std::vector<int> rollDice();
-    void getPossibleMoves(std::vector<Move> *possibleMoves, std::vector<int> diceRoll);
-    void addTemporaryMove(std::vector<Move> *possibleMoves, Checker *fromChecker, Move *move, MoveType fromType, int nextDice, int from, int to);
-    void generateLastMove(std::vector<Move> *possibleMoves, Move *move, int dice);
-    bool checkerAndPointColorIsSame(CheckerColor color, int pointIndex);
-    MoveType canMoveToPoint(CheckerColor checker, int pointIndex);
+    CheckerColor getStartingTurn();
+    void getPossibleMoves(std::vector<Move *> &possibleMoves, std::vector<int> diceRoll);
+    void TraverseBoard(std::vector<Move *> &possibleMoves, std::vector<int> diceRoll, Move *move, int currentDepth, int maxDepth);
+    bool addMoveToBoard(Checker *fromChecker, Move *move, MoveType fromType, int from, int to);
+    bool checkerAndPointColorIsSame(CheckerColor color, Board &newBoard, int pointIndex);
+    MoveType canMoveToPoint(Board &board, CheckerColor checker, int pointIndex);
     void swapTurn();
 
 public:
     bool gameEnded();
 
-    void nextGameState();
+    void nextGameState(bool firstMove);
 
-    void makeMove(Move move);
+    void makeMove(Move *move);
 };
