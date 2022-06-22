@@ -1,9 +1,8 @@
 #include "../headers/Move.hpp"
-#include <iostream>
 
 Move::Move(std::vector<int> dices, Board board)
 {
-    this->nextBoard = Board(board);
+    this->nextBoard = new Board(board);
     this->noMove = false;
 
     for (size_t i = 0; i < dices.size(); i++)
@@ -12,11 +11,15 @@ Move::Move(std::vector<int> dices, Board board)
     }
 }
 
+Move::~Move(){
+    delete this->nextBoard;
+}
+
 Move::Move(Move &source)
 {
     this->diceRole = source.diceRole;
     this->noMove = source.noMove;
-    this->nextBoard = Board(source.nextBoard);
+    this->nextBoard = new Board(*source.nextBoard);
     this->from = source.from;
     this->to = source.to;
     this->fromType = source.fromType;
@@ -33,7 +36,7 @@ void Move::appendMove(int from, int to, MoveType fromType, MoveType toType)
 
 Board &Move::getNextBoard()
 {
-    return this->nextBoard;
+    return *this->nextBoard;
 }
 
 void Move::setNoMove()

@@ -8,15 +8,16 @@
 class Board
 {
 private:
-    Point points[24];
+    Point *points = new Point[24];
     // TODO: Create Bar Class later
-    Point blackBar;
-    Point whiteBar;
+    Point *blackBar;
+    Point *whiteBar;
     int homeWhite;
     int homeBlack;
 
 public:
     Board();
+    ~Board();
     Board(Board &source);
     void popChecker(int index);
     int getNumberOfCheckersInHomeQuadrant(CheckerColor color); // TODO Kanske spara int

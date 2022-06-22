@@ -1,9 +1,17 @@
 #include "../headers/Game.hpp"
 #include <iostream>
 
+Game::Game(){
+    board = new Board();
+}
+
+Game::~Game(){
+    delete board;
+}
+
 bool Game::gameEnded()
 {
-    return this->board.getHome(white) == 15 || this->board.getHome(black) == 15 ? true : false;
+    return this->board->getHome(white) == 15 || this->board->getHome(black) == 15 ? true : false;
 }
 
 CheckerColor Game::getStartingTurn()
@@ -17,22 +25,17 @@ void Game::nextGameState(bool firstMove)
         turn = getStartingTurn();
 
     std::vector<Move *> possibleMoves;
-
-    std::cout << turn << std::endl;
-
     getPossibleMoves(possibleMoves, rollDice());
 
     for (size_t i = 0; i < possibleMoves.size(); i++)
     {
         std::cout << std::to_string(i + 1) << ": " << possibleMoves[i]->getMove() << std::endl;
-        // std::cout << possibleMoves[i].getNextBoard()->printBoard() << std::endl;
+        delete(possibleMoves[i]);
     }
 }
 
 void Game::getPossibleMoves(std::vector<Move *> &possibleMoves, std::vector<int> diceRoll)
 {
-    Move *move = new Move(diceRoll, this->board);
-
     if (turn == black)
     {
         for (int i = 0; i < 2; i++)
@@ -40,17 +43,19 @@ void Game::getPossibleMoves(std::vector<Move *> &possibleMoves, std::vector<int>
     }
     if (diceRoll[0] == diceRoll[1])
     {
-        TraverseBoard(possibleMoves, diceRoll, move, 0, 4);
+        Move *doubleDiceMove = new Move(diceRoll, *this->board);
+        TraverseBoard(possibleMoves, diceRoll, doubleDiceMove, 0, 4);
     }
     else
     {
+        Move *move = new Move(diceRoll, *this->board);
         TraverseBoard(possibleMoves, diceRoll, move, 0, 2);
         std::vector<int> reversedDice;
         reversedDice.push_back(diceRoll[1]);
         reversedDice.push_back(diceRoll[0]);
-        TraverseBoard(possibleMoves, reversedDice, move, 0, 2);
+        Move *inverseMove = new Move(diceRoll, *this->board);
+        TraverseBoard(possibleMoves, reversedDice, inverseMove, 0, 2);
     }
-    delete move;
 }
 
 void Game::TraverseBoard(std::vector<Move *> &possibleMoves, std::vector<int> diceRoll, Move *move, int currentDepth, int maxDepth)
@@ -65,52 +70,49 @@ void Game::TraverseBoard(std::vector<Move *> &possibleMoves, std::vector<int> di
         if (move->getNextBoard().getBar(turn).getCheckerAmount() > 0)
         {
             Move *newMove = new Move(*move);
-            Checker *topChecker = newMove->getNextBoard().getBar(turn).getFrontChecker();
             newMove->getNextBoard().getBar(turn).popChecker();
-            int barDice = turn == black ? 24 - diceRoll[currentDepth] : diceRoll[currentDepth] - 1;
-            if (addMoveToBoard(topChecker, newMove, bar, i, barDice))
+            int barDice = turn == black ? 24 + diceRoll[currentDepth] : diceRoll[currentDepth] - 1;
+            if (addMoveToBoard(newMove, bar, i, barDice))
             {
                 TraverseBoard(possibleMoves, diceRoll, newMove, currentDepth + 1, maxDepth);
             }
             continue;
         }
-        if (checkerAndPointColorIsSame(turn, move->getNextBoard(), i))
+        else if (checkerAndPointColorIsSame(turn, move->getNextBoard(), i))
         {
             Move *newMove = new Move(*move);
-            Checker *topChecker = newMove->getNextBoard().getPoint(i).getFrontChecker();
             newMove->getNextBoard().getPoint(i).popChecker();
-            if (addMoveToBoard(topChecker, newMove, regular, i, i - diceRoll[currentDepth]))
+            if (addMoveToBoard(newMove, regular, i, i - diceRoll[currentDepth]))
             {
                 TraverseBoard(possibleMoves, diceRoll, newMove, currentDepth + 1, maxDepth);
             }
         }
     }
+    delete move;
 }
 
-bool Game::addMoveToBoard(Checker *fromChecker, Move *move, MoveType fromType, int from, int to)
+bool Game::addMoveToBoard(Move *move, MoveType fromType, int from, int to)
 {
     switch (canMoveToPoint(move->getNextBoard(), turn, to))
     {
     case regular:
     {
         move->appendMove(from, to, fromType, regular);
-        move->getNextBoard().getPoint(to).addChecker(fromChecker);
+        move->getNextBoard().getPoint(to).addChecker(turn);
         return true;
     }
     case off:
     {
         move->appendMove(from, to, fromType, off);
-        delete (fromChecker);
         move->getNextBoard().addCheckerToHome(turn);
         return true;
     }
     case hit:
     {
-        Checker *hitChecker = move->getNextBoard().getPoint(to).getFrontChecker();
         move->getNextBoard().getPoint(to).popChecker();
-        move->getNextBoard().getPoint(to).addChecker(fromChecker);
+        move->getNextBoard().getPoint(to).addChecker(turn);
         CheckerColor oppositeColor = turn == black ? black : white;
-        move->getNextBoard().getBar(oppositeColor).addChecker(hitChecker);
+        move->getNextBoard().getBar(oppositeColor).addChecker(oppositeColor);
         return true;
     }
     default:
@@ -167,7 +169,7 @@ std::vector<int> Game::rollDice()
 
 void Game::makeMove(Move *move)
 {
-    this->board = move->getNextBoard();
+    this->board = &move->getNextBoard();
     history.push_back(move);
     swapTurn();
 }

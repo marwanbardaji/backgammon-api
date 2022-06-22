@@ -9,7 +9,7 @@
 class Move
 {
     bool noMove;
-    Board nextBoard;
+    Board *nextBoard;
     std::string diceRole;
     std::vector<MoveType> fromType;
     std::vector<MoveType> toType;
@@ -19,6 +19,7 @@ class Move
 public:
     Move(std::vector<int> dices, Board board);
     Move(Move &source);
+    ~Move();
     void appendMove(int from, int to, MoveType fromType, MoveType toType);
     void setNoMove();
     int getDiceIndexOfMove();
