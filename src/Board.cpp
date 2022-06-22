@@ -19,8 +19,9 @@ Board::Board()
     this->homeWhite = 0;
 }
 
-Board::~Board(){
-    delete [] points;
+Board::~Board()
+{
+    delete[] points;
     delete blackBar;
     delete whiteBar;
 }
@@ -33,8 +34,8 @@ Board::Board(Board &source)
     }
     this->homeBlack = source.homeBlack;
     this->homeWhite = source.homeWhite;
-    this->blackBar = new Point(black,source.getBar(black).getCheckerAmount());
-    this->whiteBar = new Point(white,source.getBar(white).getCheckerAmount());
+    this->blackBar = new Point(black, source.getBar(black).getCheckerAmount());
+    this->whiteBar = new Point(white, source.getBar(white).getCheckerAmount());
 }
 
 int Board::getNumberOfCheckersInHomeQuadrant(CheckerColor color)

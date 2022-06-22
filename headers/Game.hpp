@@ -16,7 +16,7 @@ private:
 
     std::vector<int> rollDice();
     CheckerColor getStartingTurn();
-    void getPossibleMoves(std::vector<Move *> &possibleMoves, std::vector<int> diceRoll);
+    void generateDiceVariants(std::vector<Move *> &possibleMoves, std::vector<int> diceRoll);
     void TraverseBoard(std::vector<Move *> &possibleMoves, std::vector<int> diceRoll, Move *move, int currentDepth, int maxDepth);
     bool addMoveToBoard(Move *move, MoveType fromType, int from, int to);
     bool checkerAndPointColorIsSame(CheckerColor color, Board &newBoard, int pointIndex);
@@ -29,7 +29,7 @@ public:
 
     bool gameEnded();
 
-    void nextGameState(bool firstMove);
+    std::vector<Move *> &getPossibleMoves(bool firstMove);
 
     void makeMove(Move *move);
 };

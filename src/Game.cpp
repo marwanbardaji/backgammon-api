@@ -1,11 +1,13 @@
 #include "../headers/Game.hpp"
 #include <iostream>
 
-Game::Game(){
+Game::Game()
+{
     board = new Board();
 }
 
-Game::~Game(){
+Game::~Game()
+{
     delete board;
 }
 
@@ -19,22 +21,16 @@ CheckerColor Game::getStartingTurn()
     return CheckerColor(rand() % 2);
 }
 
-void Game::nextGameState(bool firstMove)
+std::vector<Move *> &Game::getPossibleMoves(bool firstMove)
 {
     if (firstMove)
         turn = getStartingTurn();
-
-    std::vector<Move *> possibleMoves;
-    getPossibleMoves(possibleMoves, rollDice());
-
-    for (size_t i = 0; i < possibleMoves.size(); i++)
-    {
-        std::cout << std::to_string(i + 1) << ": " << possibleMoves[i]->getMove() << std::endl;
-        delete(possibleMoves[i]);
-    }
+    std::vector<Move *> *possibleMoves = new std::vector<Move *>;
+    generateDiceVariants(*possibleMoves, rollDice());
+    return *possibleMoves;
 }
 
-void Game::getPossibleMoves(std::vector<Move *> &possibleMoves, std::vector<int> diceRoll)
+void Game::generateDiceVariants(std::vector<Move *> &possibleMoves, std::vector<int> diceRoll)
 {
     if (turn == black)
     {
@@ -169,6 +165,7 @@ std::vector<int> Game::rollDice()
 
 void Game::makeMove(Move *move)
 {
+    delete (this->board);
     this->board = &move->getNextBoard();
     history.push_back(move);
     swapTurn();

@@ -22,7 +22,6 @@ void Point::initializeCopiedPoint(PointColor occupiedColor, int checkerAmount)
     }
 }
 
-
 PointColor Point::getOccupiedColor()
 {
     return this->occupiedColor;

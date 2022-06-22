@@ -11,7 +11,8 @@ Move::Move(std::vector<int> dices, Board board)
     }
 }
 
-Move::~Move(){
+Move::~Move()
+{
     delete this->nextBoard;
 }
 
