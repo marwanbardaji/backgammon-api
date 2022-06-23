@@ -28,5 +28,5 @@ public:
     std::vector<int> getTo();
     std::vector<MoveType> getFromType();
     std::vector<MoveType> getToType();
-    std::string getMove();
+    std::string getMove(CheckerColor color);
 };

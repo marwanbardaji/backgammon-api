@@ -65,7 +65,7 @@ std::vector<MoveType> Move::getToType()
     return this->toType;
 }
 
-std::string Move::getMove()
+std::string Move::getMove(CheckerColor color)
 {
     if (noMove)
         return "(no-play)";
@@ -78,7 +78,14 @@ std::string Move::getMove()
         }
         else
         {
-            move += std::to_string(from[i]);
+            if (color == black)
+            {
+                move += std::to_string(abs(24 - from[i]));
+            }
+            else
+            {
+                move += std::to_string(from[i] + 1);
+            }
         }
         move += "/";
         if (toType[i] == off)
@@ -87,11 +94,26 @@ std::string Move::getMove()
         }
         else if (toType[i] == hit)
         {
-            move += std::to_string(to[i]) + "*";
+            if (color == black)
+            {
+                move += std::to_string(abs(24 - to[i]));
+            }
+            else
+            {
+                move += std::to_string(to[i] + 1);
+            }
+            move += "*";
         }
         else
         {
-            move += std::to_string(to[i]);
+            if (color == black)
+            {
+                move += std::to_string(abs(24 - to[i]));
+            }
+            else
+            {
+                move += std::to_string(to[i] + 1);
+            }
         }
         move += " ";
     }

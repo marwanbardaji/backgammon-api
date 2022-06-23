@@ -28,6 +28,7 @@ public:
     ~Game();
 
     bool gameEnded();
+    CheckerColor getTurn();
 
     std::vector<Move *> &getPossibleMoves(bool firstMove);
 

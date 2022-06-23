@@ -21,8 +21,14 @@ CheckerColor Game::getStartingTurn()
     return CheckerColor(rand() % 2);
 }
 
+CheckerColor Game::getTurn()
+{
+    return this->turn;
+}
+
 std::vector<Move *> &Game::getPossibleMoves(bool firstMove)
 {
+    std::cout << this->board->printBoard() << std::endl;
     if (firstMove)
         turn = getStartingTurn();
     std::vector<Move *> *possibleMoves = new std::vector<Move *>;
@@ -32,7 +38,7 @@ std::vector<Move *> &Game::getPossibleMoves(bool firstMove)
 
 void Game::generateDiceVariants(std::vector<Move *> &possibleMoves, std::vector<int> diceRoll)
 {
-    if (turn == black)
+    if (turn == white)
     {
         for (int i = 0; i < 2; i++)
             diceRoll[i] = -diceRoll[i];
